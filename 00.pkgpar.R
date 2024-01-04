@@ -1,0 +1,62 @@
+################################################################################
+# CONFOUNDING ISSUES IN AIR POLLUTION EPIDEMIOLOGY
+################################################################################
+
+################################################################################
+# LOAD THE PACKAGES AND SET THE PARAMETERS
+################################################################################
+
+# LOAD THE PACKAGES
+library(data.table) ; library(dplyr)
+library(survival) ; library(Epi)
+library(splines)
+library(mice)
+#library(ggplot2); library(patchwork) ; library(scales)
+#library(foreach) ; library(doParallel)
+
+# DIRECTORIES
+maindir <- "V:/VolumeQ/AGteam/UKBiobank/data/processed/ukb671152/"
+#maindir <- "C:/Users/anton/Desktop/data/processed/ukb671152/"
+pmdir <- "V:/VolumeQ/AGteam/UKBiobank/data/original/envdata/"
+#pmdir <- "C:/Users/anton/Desktop/data/"
+
+# SELECT MORTALITY OUTCOMES (EXCLUDE ACCIDENTAL)
+icdcode <- LETTERS[seq(which(LETTERS=="R"))]
+
+# RANGE INCRESE FOR HR COMPUTATION
+pminc <- 10
+
+# LAG WINDOW
+lag <- 7
+
+# SETS FOR CONFOUNDER MODELS
+confarea <- c("tdi", "urbrur", "greenspace")
+confses <- c("ethnic", "educ", "income", "employ")
+confother <- c("smkstatus", "smkpackyear", "alcoholintake", "wthratio", "ipaq",
+  "livealone")
+# NO health AND illness
+confall <- c(confarea, confses, confother)
+
+# FUNCTION TO DEFINE THE MODEL FORMULA (WITH DEFAULT)
+funfmod <- function(response="Surv(dstartfu, dexit, event)",
+  strata=c("asscentre", "sex", "birthyear"), conf=confall, lag=7) {
+  f <- paste0(response, " ~ ", "strata(", paste0(strata, collapse=", "), ") + ",
+    paste0(conf, collapse=" + "), " + pm25_0", lag)
+  formula(f, env=parent.frame())
+}
+
+# FUNCTION TO FORMAT ESTIMATES
+funformat <- function(x, digits=1, big.mark="") 
+  formatC(x, digits=digits, format="f", big.mark=big.mark)
+
+# FUNCTION TO FORMAT ESTIMATES WITH RANGES
+frange <- function(est, digits=2, big.mark="", sep="-") {
+  paste0(funformat(est[1], digits=digits, big.mark=big.mark), " (",
+    funformat(est[2], digits=digits, big.mark=big.mark), sep,
+    funformat(est[3], digits=digits, big.mark=big.mark), ")")
+}
+
+# FUNCTION TO EXTRACT DISTRIBUTIONAL STATS
+fdstat <- function(x, per=perlin, digits=2, big.mark="", sep=" to ") 
+  c(mean(x, na.rm=T),quantile(x, per, na.rm=T)) |> 
+  frange(digits=digits, big.mark=big.mark, sep=sep)
