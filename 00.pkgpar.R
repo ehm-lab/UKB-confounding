@@ -9,7 +9,7 @@
 # LOAD THE PACKAGES
 library(data.table) ; library(dplyr)
 library(survival) ; library(Epi)
-library(splines)
+library(splines) ; library(coxme)
 library(mice)
 #library(ggplot2); library(patchwork) ; library(scales)
 #library(foreach) ; library(doParallel)
@@ -60,3 +60,4 @@ frange <- function(est, digits=2, big.mark="", sep="-") {
 fdstat <- function(x, per=perlin, digits=2, big.mark="", sep=" to ") 
   c(mean(x, na.rm=T),quantile(x, per, na.rm=T)) |> 
   frange(digits=digits, big.mark=big.mark, sep=sep)
+
