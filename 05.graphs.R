@@ -321,7 +321,7 @@ ggsave(file = "C:/Users/lsh2004062/Downloads/trendses.png",
        plot, width = 5000, height =2500, units = "px")
 
 ###################################################
-#CREATE PLOTS FOR INDIVIDUAL SES CONFS
+#CREATE PLOTS FOR INDIVIDUAL SES CONFS (2 PLOTS SEPARATE)
 #Arrange plots
 plot<-wrap_plots(c(pmlist[which(confall %in% confother)][1:3],
                    mrlist[which(confall %in% confother)][1:3]) , ncol=3) + 
