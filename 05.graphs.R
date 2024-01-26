@@ -146,114 +146,8 @@ ggsave(file = "C:/Users/lsh2004062/Downloads/centre.png",
        width = 3500, height =2000, units = "px")
 
 
-
 #####################################################################
-#PLOT MORTALITY RATES VS PM FOR AREA-LEVEL COVARIATES
-#####################################################################
-
-##################
-#PM DISTRIBUTION
-# ##################
-# 
-# #DEPRIVATION
-# pmplot1 <- pmdata |>  
-#   merge(bdbasevar[,.(eid, tdi)],  by="eid") |>
-#   mutate(deprivation = cut(tdi, 5, 
-#           label = c("1th","2nd","3rd","4th","5th"))) |>
-#   subset(eid %in% fulldata$eid, select=c("eid",   "deprivation",  "pm25")) |>
-#   na.omit() |>
-#   ggplot(aes(x=deprivation, y=pm25)) +
-#   geom_boxplot(fill="lightskyblue", alpha=0.8, outlier.alpha=0.8,
-#                outlier.size=0.5, shape=19) +
-#   labs(y=ylab, x="") +
-#   theme_bw() 
-# 
-# 
-# #GREENSPACE
-# pmplot2 <- pmdata |>  
-#   merge(bdbasevar[,.(eid, greenspace)],  by="eid") |>
-#   mutate(greenspace= cut(greenspace, 5, 
-#           label = c("1th","2nd","3rd","4th","5th"))) |>
-#   subset(eid %in% fulldata$eid, 
-#          select=c("eid","greenspace","pm25")) |>
-#   na.omit() |>
-#   ggplot(aes(x=greenspace, y=pm25)) +
-#   geom_boxplot(fill="lightskyblue", alpha=0.8, outlier.alpha=0.8,
-#                outlier.size=0.5, shape=19) +
-#   labs(y="", x="") +
-#   theme_bw() 
-# 
-# #URBAN/RURAL
-# pmplot3 <- pmdata |>  
-#   merge(bdbasevar[,.(eid, urbrur)],  by="eid") |>
-#   subset(eid %in% fulldata$eid, 
-#          select=c("eid", "urbrur", "pm25")) |>
-#   na.omit() |>
-#   ggplot(aes(x=urbrur, y=pm25)) +
-#   geom_boxplot(fill="lightskyblue", alpha=0.8, outlier.alpha=0.8,
-#                outlier.size=0.5, shape=19) +
-#   labs(y="", x="") +
-#   theme_bw() 
-# 
-# 
-# 
-# 
-# ##################
-# #MORTALITY RATES
-# ##################
-# 
-# #DEPRIVATION
-# mrplot1 <- fulldata |> 
-#   unique(by="eid") |>
-#   group_by(deprivation) |>
-#   summarize(cases=sum(!is.na(icd10)), 
-#             pop = n(),
-#             rate = (cases/pop)*1000) |>
-#   ggplot(aes(x=deprivation,y=rate))+
-#   geom_bar(stat = "identity") +
-#   ylim(0, 140) +
-#   labs(y="rate (x1000 persons)", x="deprivation") +
-#   theme_bw()
-# 
-# #GREENSPACE
-# mrplot2 <- fulldata |> 
-#   unique(by="eid") |>
-#   group_by(greenspace) |>
-#   summarize(cases=sum(!is.na(icd10)), 
-#             pop = n(),
-#             rate = (cases/pop)*1000) |>
-#   ggplot(aes(x=greenspace,y=rate))+
-#   geom_bar(stat = "identity") +
-#   ylim(0, 140) +
-#   labs(y="", x="Greenspace percentage (%)") +
-#   theme_bw()
-# 
-# #URBAN/RURAL
-# mrplot3 <- fulldata |> 
-#   unique(by="eid") |>
-#   group_by(urbrur) |>
-#   summarize(cases=sum(!is.na(icd10)), 
-#             pop = n(),
-#             rate = (cases/pop)*1000) |>
-#   ggplot(aes(x=urbrur,y=rate)) +
-#   geom_bar(stat = "identity") +
-#   ylim(0, 140) +
-#   labs(y="", x="urban/rural classification") +
-#   theme_bw()
-
-#Arrange plots
-trendplot<-wrap_plots(list(pmplot1,pmplot2, pmplot3,
-                           mrplot1,mrplot2,mrplot3) , ncol=3) + 
-           plot_annotation(title = 'Particulate and mortality trends by area-level confounders',
-                  theme = theme(plot.title = element_text(size = 20)))
-
-#SAVE PLOT
-ggsave(file = "C:/Users/lsh2004062/Downloads/trendarea.png",
-       trendplot, width = 4000, height =2500, units = "px")
-
-
-#####################################################################
-#PLOT MORTALITY RATES VS PM FOR INDIVIDUAL-LEVEL COVARIATES
+#PLOT MORTALITY RATES VS PM FOR INDIVIDUAL- and AREA- LEVEL COVARIATES
 #####################################################################
 
 pmlist<-list()
@@ -321,7 +215,7 @@ ggsave(file = "C:/Users/lsh2004062/Downloads/trendses.png",
        plot, width = 5000, height =2500, units = "px")
 
 ###################################################
-#CREATE PLOTS FOR INDIVIDUAL SES CONFS (2 PLOTS SEPARATE)
+#CREATE PLOTS FOR INDIVIDUAL "OTHER" CONFS (2 PLOTS SEPARATE)
 #Arrange plots
 plot<-wrap_plots(c(pmlist[which(confall %in% confother)][1:3],
                    mrlist[which(confall %in% confother)][1:3]) , ncol=3) + 
