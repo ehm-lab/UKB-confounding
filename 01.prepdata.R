@@ -23,21 +23,15 @@ names(pmdata)[1] <- "eid"
 pmdata[, paste0("pm25_",0,lag):=rowMeans(Reduce(cbind, shift(pm25, 0:lag))), 
   by=eid]
 
-#CATEGORIZE CONTINUOUS VARIABLES
-bdbasevar<- bdbasevar[,`:=`(smkpackyear = cut(smkpackyear, c(0,0.5,10,30,60,1000),
-                                              label = c("0","<=10","10-30",
-                                                        "30-60",">60"),
-                                              include.lowest = T),
-             wthratio = factor(ifelse(sex=="Female",
-                                      cut(wthratio, c(0,0.80,0.85,100), 
-                                      label = c("low", "medium","high")),
-                                      cut(wthratio, c(0,0.95,1,100), 
-                                    label = c("low", "medium","high"))), 
-                               labels =c("low", "medium","high") ),
-             greenspace = cut(greenspace, 5, label = c("1th","2nd","3rd","4th","5th")),
-             tdi = cut(tdi, 5, label = c("1th","2nd","3rd","4th","5th")))]
-
-
+# CATEGORIZE CONTINUOUS VARIABLES
+bdbasevar <- bdbasevar[,`:=`(
+  smkpackyearcat = cut(smkpackyear, c(0,0.5,10,30,60,1000), 
+    label=c("0","<=10","10-30", "30-60",">60"), include.lowest=T),
+  wthratiocat = factor(ifelse(sex=="Female", cut(wthratio, c(0,0.80,0.85,100), 
+    label = c("low", "medium","high")), cut(wthratio, c(0,0.95,1,100), 
+      label = c("low", "medium","high"))), labels =c("low", "medium","high")),
+  greenspacecat = cut(greenspace, 5, label = c("1th","2nd","3rd","4th","5th")),
+  tdicat = cut(tdi, 5, label = c("1th","2nd","3rd","4th","5th")))]
 
 # TRANSFORM BASELINE VARIABLES IN UNORDERED FACTORS (FOR REGRESSION MODEL)
 ordvar <- names(bdbasevar)[sapply(bdbasevar, is.ordered)]
@@ -79,3 +73,9 @@ fulldata <- subset(fulldata, select=-c(sex,asscentre)) |>
 setkey(fulldata, eid, year)
 setkey(pmdata, eid, year)
 fulldata <- merge(fulldata, na.omit(pmdata), by=c("eid","year"))
+
+# APPROXIMATE AGE GROUPS
+fulldata[, agegr:=cut(year-year(dob), breaks=agebreaks, labels=agelabs)]
+pmdata <- merge(pmdata, subset(bdcohortinfo, select=c(eid,dob)), by="eid")
+pmdata[, agegr:=cut(year-year(dob), breaks=agebreaks, labels=agelabs)]
+pmdata[, dob:=NULL]
