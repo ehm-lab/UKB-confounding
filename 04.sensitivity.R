@@ -3,116 +3,68 @@
 ################################################################################
 
 ################################################################################
-# RUN SENSITIVITY MODEL FOR ASSESSMENT CENTRE INCLUSION
+# RUN SENSITIVITY ANALYSIS
 ################################################################################
 
 # OBJECTS TO STORE THE RESULTS
-resens <- list()
+senslist <- list()
 
-# FIT MODEL WITH STRATA
+# FIT THE MAIN MODEL
 fmod <- funfmod()
-resens$strata <- coxph(fmod, data=fulldata, ties="efron") |> 
+senslist$main <- coxph(fmod, data=fulldata, ties="efron") |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
+
+################################################################################
+# EFFECT OF ASSESSMENT CENTRE
 
 # FIT MODEL WITH WITH DUMMY VARIABLE
-fmod <- funfmod(strata=c("sex","birthyear"), 
-                conf=c(confall, "asscentre"))
-resens$dummy <- update(mod, fmod) |> 
+fmod <- funfmod(strata=c("sex","birthyear"), conf=c(confall, "asscentre"))
+senslist$dummy <- update(mod, fmod) |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
-#FIT MODEL WITH RANDOM EFFECT (coxme)
-fmod <- funfmod(strata=c("sex","birthyear"), 
-                conf=c(confall, "(1| asscentre)"))
-resens$coxme <- coxme(fmod, data=fulldata, ties="efron") |>  
+# FIT MODEL WITH RANDOM EFFECT (coxme)
+fmod <- funfmod(strata=c("sex","birthyear"),  conf=c(confall, "(1| asscentre)"))
+senslist$coxme <- coxme(fmod, data=fulldata, ties="efron") |>  
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
-#FIT MODEL WITH FRAILTY
+# FIT MODEL WITH FRAILTY
 fmod <- funfmod(strata=c("sex","birthyear"), 
-                conf=c(confall, "frailty(asscentre)"))
-resens$frailty <- update(mod, fmod) |> 
+  conf=c(confall, "frailty(asscentre)"))
+senslist$frailty <- update(mod, fmod) |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
-#FIT MODEL WITH CLUSTER (DO NOT USE "cluster(asscentre)" in formula)
-fmod <- funfmod(strata=c("sex","birthyear"), 
-                conf=confall)
-resens$coxme <- update(mod, formula=fmod, cluster=asscentre) |>  
+# FIT MODEL WITH CLUSTER (DO NOT USE "cluster(asscentre)" in formula)
+fmod <- funfmod(strata=c("sex","birthyear"), conf=confall)
+senslist$coxme <- update(mod, formula=fmod, cluster=asscentre) |>  
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
+################################################################################
+# EXCLUSION OF LONDON AND/OR GLASGOW
+
+# FIT MODEL WITHOUT LONDON 
+fmod <- funfmod()
+senslist$nolnd <- update(mod, data=subset(fulldata, !(asscentre %in% 
+    c("Hounslow","Croydon","Barts")))) |> 
+  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
+
+# FIT MODEL WITHOUT GLASGOW
+fmod <-  funfmod()
+senslist$noglg <- update(mod, data=subset(fulldata, 
+  !(asscentre %in% c("Glasgow")))) |> 
+  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
+
+# FIT MODEL WITHOUT LONDON AND GLASGOW
+fmod <-  funfmod()
+senslist$nolndglg <- update(mod, data=subset(fulldata, 
+  !(asscentre %in% c("Hounslow","Croydon","Barts","Glasgow")))) |> 
+  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
 ################################################################################
 # PUT TOGETHER AND SAVE
 
 # ASSEMBLE
-modres <- Reduce(rbind, resens)
-rownames(modres) <- names(resens)
+modsens <- Reduce(rbind, senslist)
+rownames(modsens) <- names(senslist)
 
 # SAVE
-saveRDS(modres, file="temp/modresens.RDS")
-
-
-
-
-################################################################################
-# RUN SENSITIVITY MODEL FOR INCLUSION OF LONDON AND GLASGOW
-################################################################################
-
-# OBJECTS TO STORE THE RESULTS
-resens <- list()
-
-# FIT THE MAIN MODEL
-fmod <- funfmod()
-mod <- coxph(fmod, data=fulldata, ties="efron")
-
-# STORE THE RESULT (HR FOR A 10-UNIT INCREASE IN PM25)
-resens$main <- ci.exp(mod, subset="pm25_07", ctr.mat=matrix(10))
-
-# FIT MODEL WITH STRATA(CENTRE) WITHOUT LONDON 
-fmod <- funfmod()
-resens$nolondon <- update(mod, 
-              data=subset(fulldata, !(asscentre %in% 
-                 c("Hounslow","Croydon","Barts")))) |> 
-  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
-
-#FIT MODEL WITHOUT STRATA(CENTRE) WITHOUT LONDON 
-fmod <- funfmod(strata=c("sex","birthyear"), 
-                conf=confall)
-resens$nocentrelondon <- update(mod, fmod, 
-                data=subset(fulldata, !(asscentre %in% 
-                      c("Hounslow","Croydon","Barts")))) |> 
-  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
-
-
-# FIT MODEL WITH STRATA(CENTRE) WITHOUT GLASGOW
-fmod <-  funfmod()
-resens$noglasgow <- update(mod, data=subset(fulldata, 
-                  !(asscentre %in% c("Glasgow")))) |> 
-  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
-
-#FIT MODEL WITHOUT STRATA(CENTRE) WITHOUT GLASGOW
-fmod <- funfmod(strata=c("sex","birthyear"), 
-                conf=confall)
-resens$nocentreglasgow <- update(mod, fmod,
-              data=subset(fulldata,
-                          !(asscentre %in% c("Glasgow")))) |> 
-  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
-
-
-# FIT MODEL WITH STRATA(CENTRE) WITHOUT LONDON AND GLASGOW
-fmod <-  funfmod()
-resens$nolondglas <- update(mod, data=subset(fulldata, 
-                    !(asscentre %in% c("Hounslow","Croydon","Barts","Glasgow")))) |> 
-  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
-
-#FIT MODEL WITHOUT STRATA(CENTRE) WITHOUT LONDON AND GLASGOW
-fmod <- funfmod(strata=c("sex","birthyear"), 
-                conf=confall)
-resens$nocentrelondglas <- update(mod, fmod,
-                          data=subset(fulldata,
-                      !(asscentre %in% c("Hounslow","Croydon","Barts","Glasgow")))) |> 
-  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
-
-
-
-
-
-
+saveRDS(modsens, file="temp/modsens.RDS")

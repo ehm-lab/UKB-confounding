@@ -11,7 +11,7 @@ library(data.table) ; library(dplyr)
 library(survival) ; library(Epi)
 library(splines) ; library(coxme)
 library(mice)
-#library(ggplot2); library(patchwork) ; library(scales)
+library(ggplot2); library(patchwork) ; library(scales) ; library(ggrepel)
 #library(foreach) ; library(doParallel)
 
 # DIRECTORIES
@@ -61,3 +61,11 @@ fdstat <- function(x, per=perlin, digits=2, big.mark="", sep=" to ")
   c(mean(x, na.rm=T),quantile(x, per, na.rm=T)) |> 
   frange(digits=digits, big.mark=big.mark, sep=sep)
 
+# FUNCTION TO DEFINE DEATH RATES BY SOME VARIABLE
+frate <- function(data, var, mult=10^5) 
+  summarise(data, cases=sum(event), py=sum(dexit-dstartfu)/365.25, 
+    rate=cases/py*10^5, .by=var)
+
+# AGE GROUPING
+agebreaks <- c(0, 9:16*5, 100)
+agelabs <- c("<45", paste0(9:15*5, "-", 9:15*5+4), "80+")
