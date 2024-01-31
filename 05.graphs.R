@@ -18,7 +18,7 @@ plotyear <- pmdata |>
   summarize(pm25 = mean(pm25, na.rm=T), .by=year) |>
   ggplot(aes(x=year, y=pm25)) +
   geom_line() +
-  geom_point(size=5) +
+  geom_point(size=6, shape=18) +
   geom_point(aes(x=year,y=rate/100), size=5, col="red", data=frate(fulldata, "year")) +
   geom_line(aes(x=year,y=rate/100), col="red", data=frate(fulldata, "year")) +
   theme(axis.title=element_text(size=15), axis.text.x = element_text(size=10)) +
@@ -34,7 +34,7 @@ plotage <- pmdata |>
   summarize(pm25 = mean(pm25, na.rm=T), .by=agegr) |>
   ggplot(aes(x=agegr, y=pm25, group=1)) +
   geom_line() +
-  geom_point(size=5) +
+  geom_point(size=6, shape=18) +
   geom_point(aes(x=agegr,y=rate/100), size=5, col="red", data=frate(fulldata, "agegr")) +
   geom_line(aes(x=agegr,y=rate/100), col="red", data=frate(fulldata, "agegr")) +
   theme(axis.title=element_text(size=15), axis.text.x = element_text(size=10)) +
