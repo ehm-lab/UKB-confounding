@@ -50,7 +50,7 @@ plotage <- pmdata |>
 ggsave(file="figures/plottrend.pdf", plotyear + plotage, width=15, height=5)
 
 ################################################################################
-# SPATIAL DISTRIBUTION
+# ASSESSMENT CENTRE
 
 # PLOT MORTALITY RATES VS PM ACROSS CENTRE
 plotasscentre <- summarise(fulldata, pm25=mean(pm25), .by=asscentre) |>
@@ -59,208 +59,60 @@ plotasscentre <- summarise(fulldata, pm25=mean(pm25), .by=asscentre) |>
   geom_point(aes(size=py), show.legend=F) +
   geom_smooth(method="lm", aes(weight=py), se=T) +
   geom_text_repel(aes(label=asscentre), size=3) +
-  coord_cartesian(xlim=c(450,1000), ylim=c(5,15)) +
+  coord_cartesian(xlim=c(460,950), ylim=c(5,15)) +
   labs(y=pmlab, x="Mortality rate (x 100,000)") +
+  scale_x_continuous(breaks=5:9*100, minor_breaks=NULL) +
   theme_bw()
 
 #SAVE PLOT
 #ggsave(file="figures/plotasscentre.png", width=3500, height=2000, units="px")
 ggsave(file="figures/plotasscentre.pdf", width=10, height=6)
 
+################################################################################
+# CONTEXTUAL AND INDIVIDUAL-LEVEL VARIABLES
 
+# LIST OF VARIABLES
+varlist <- c("tdicat","greenspacecat","urbrur",
+  "educ", "income", "employ",
+  "smkpackyearcat", "alcoholintake", "ipaq")
+varlabs <- c("Area-level deprivation", "Greenspace", "Urban-rural",
+  "Education", "Income (£)", "Employment", 
+  "Smoking", "Alcohol intake", "Physical activity")
 
-#####################################################################
-#PLOT MORTALITY RATES VS PM FOR AREA-LEVEL COVARIATES
-#####################################################################
-
-##################
-#PM DISTRIBUTION
-# ##################
-# 
-# #DEPRIVATION
-# pmplot1 <- pmdata |>  
-#   merge(bdbasevar[,.(eid, tdi)],  by="eid") |>
-#   mutate(deprivation = cut(tdi, 5, 
-#           label = c("1th","2nd","3rd","4th","5th"))) |>
-#   subset(eid %in% fulldata$eid, select=c("eid",   "deprivation",  "pm25")) |>
-#   na.omit() |>
-#   ggplot(aes(x=deprivation, y=pm25)) +
-#   geom_boxplot(fill="lightskyblue", alpha=0.8, outlier.alpha=0.8,
-#                outlier.size=0.5, shape=19) +
-#   labs(y=ylab, x="") +
-#   theme_bw() 
-# 
-# 
-# #GREENSPACE
-# pmplot2 <- pmdata |>  
-#   merge(bdbasevar[,.(eid, greenspace)],  by="eid") |>
-#   mutate(greenspace= cut(greenspace, 5, 
-#           label = c("1th","2nd","3rd","4th","5th"))) |>
-#   subset(eid %in% fulldata$eid, 
-#          select=c("eid","greenspace","pm25")) |>
-#   na.omit() |>
-#   ggplot(aes(x=greenspace, y=pm25)) +
-#   geom_boxplot(fill="lightskyblue", alpha=0.8, outlier.alpha=0.8,
-#                outlier.size=0.5, shape=19) +
-#   labs(y="", x="") +
-#   theme_bw() 
-# 
-# #URBAN/RURAL
-# pmplot3 <- pmdata |>  
-#   merge(bdbasevar[,.(eid, urbrur)],  by="eid") |>
-#   subset(eid %in% fulldata$eid, 
-#          select=c("eid", "urbrur", "pm25")) |>
-#   na.omit() |>
-#   ggplot(aes(x=urbrur, y=pm25)) +
-#   geom_boxplot(fill="lightskyblue", alpha=0.8, outlier.alpha=0.8,
-#                outlier.size=0.5, shape=19) +
-#   labs(y="", x="") +
-#   theme_bw() 
-# 
-# 
-# 
-# 
-# ##################
-# #MORTALITY RATES
-# ##################
-# 
-# #DEPRIVATION
-# mrplot1 <- fulldata |> 
-#   unique(by="eid") |>
-#   group_by(deprivation) |>
-#   summarize(cases=sum(!is.na(icd10)), 
-#             pop = n(),
-#             rate = (cases/pop)*1000) |>
-#   ggplot(aes(x=deprivation,y=rate))+
-#   geom_bar(stat = "identity") +
-#   ylim(0, 140) +
-#   labs(y="rate (x1000 persons)", x="deprivation") +
-#   theme_bw()
-# 
-# #GREENSPACE
-# mrplot2 <- fulldata |> 
-#   unique(by="eid") |>
-#   group_by(greenspace) |>
-#   summarize(cases=sum(!is.na(icd10)), 
-#             pop = n(),
-#             rate = (cases/pop)*1000) |>
-#   ggplot(aes(x=greenspace,y=rate))+
-#   geom_bar(stat = "identity") +
-#   ylim(0, 140) +
-#   labs(y="", x="Greenspace percentage (%)") +
-#   theme_bw()
-# 
-# #URBAN/RURAL
-# mrplot3 <- fulldata |> 
-#   unique(by="eid") |>
-#   group_by(urbrur) |>
-#   summarize(cases=sum(!is.na(icd10)), 
-#             pop = n(),
-#             rate = (cases/pop)*1000) |>
-#   ggplot(aes(x=urbrur,y=rate)) +
-#   geom_bar(stat = "identity") +
-#   ylim(0, 140) +
-#   labs(y="", x="urban/rural classification") +
-#   theme_bw()
-
-#Arrange plots
-trendplot<-wrap_plots(list(pmplot1,pmplot2, pmplot3,
-                           mrplot1,mrplot2,mrplot3) , ncol=3) + 
-           plot_annotation(title = 'Particulate and mortality trends by area-level confounders',
-                  theme = theme(plot.title = element_text(size = 20)))
-
-#SAVE PLOT
-ggsave(file = "C:/Users/lsh2004062/Downloads/trendarea.png",
-       trendplot, width = 4000, height =2500, units = "px")
-
-
-#####################################################################
-#PLOT MORTALITY RATES VS PM FOR INDIVIDUAL-LEVEL COVARIATES
-#####################################################################
-
-pmlist<-list()
-mrlist <- list()
-
-for (i in 1:length(confall))  {
-  
-  var <- confall[i]
-  
-  pmplot <- pmdata |>  
-    merge(bdbasevar[,.(eid, var= eval(parse(text = var)))],  by="eid") |>
-    subset(eid %in% fulldata$eid, 
-           select=c("eid", "var", "pm25")) |>
+# LIST OF EXPOSURE PLOTS
+plotexpvarlist <- lapply(seq(varlist), function(i) {
+  subset(fulldata, select=c("eid", varlist[i])) |> unique() |>
+    merge(pmdata) |> subset(select=c("eid","year","pm25",varlist[i])) |> 
     na.omit() |>
-    ggplot(aes(x=var, y=pm25)) +
-    geom_boxplot(fill="lightskyblue", alpha=0.8, outlier.alpha=0.8,
-                 outlier.size=0.5, shape=19) +
-    scale_x_discrete(guide = guide_axis(n.dodge=2))+
-    labs(y="", x="") +
+    ggplot(aes(x=get(varlist[i]), y=pm25)) +
+    geom_boxplot(fill="lightskyblue", alpha=0.8, outlier.shape=NA) +
+    scale_x_discrete(labels = NULL) +
+    labs(title=varlabs[i], y=pmlab, x="") +
+    theme_bw()
+})
+
+# LIST OF MORTALITY RATE PLOTS
+plotratevarlist <- lapply(seq(varlist), function(i) {
+  frate(fulldata, varlist[i]) |>
+    ggplot(aes(x=get(varlist[i]), y=rate))+
+    geom_bar(stat = "identity", col=1, fill=grey(0.7), alpha=0.3) +
+    #ylim(0, 1300) +
+    labs(y="Mortality rate (x 100,000)", x="") +
+    #scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
+    scale_x_discrete(guide = guide_axis(angle = 35)) +
     theme_bw() 
-  
-  mrplot <- fulldata |> 
-    _[,.(eid,icd10,var=eval(parse(text = var)))] |>
-    unique(by="eid") |>
-    group_by(var) |>
-    summarize(cases=sum(!is.na(icd10)), 
-              pop = n(),
-              rate = (cases/pop)*1000) |>
-    ggplot(aes(x=var,y=rate)) +
-    geom_bar(stat = "identity") +
-    scale_x_discrete(guide = guide_axis(n.dodge=2))+
-    theme_bw()+
-    ylim(0, 140) +
-    labs(y="", x=confall[i]) 
-  
-  
-  pmlist[[i]]<-pmplot
-  mrlist[[i]]<-mrplot
-}
+})
 
+# COMBINED PLOTS
+plotareavar <- (Reduce('+', plotexpvarlist[1:3]) + plot_layout(widths=c(5,5,3))) /
+  (Reduce('+', plotratevarlist[1:3]) + plot_layout(widths=c(5,5,3)))
+plotsesvar <- (Reduce('+', plotexpvarlist[4:6]) + plot_layout(widths=c(4,5,3))) /
+  (Reduce('+', plotratevarlist[4:6]) + plot_layout(widths=c(4,5,3)))
+plotothervar <- (Reduce('+', plotexpvarlist[7:9]) + plot_layout(widths=c(5,6,3))) /
+  (Reduce('+', plotratevarlist[7:9]) + plot_layout(widths=c(5,6,3)))
 
-###################################################
-#CREATE PLOTS FOR AREA-LEVEL CONFS
-#Arrange plots
-plot<-wrap_plots(c(pmlist[which(confall %in% confarea)],
-                        mrlist[which(confall %in% confarea)]) , ncol=3) + 
-  plot_annotation(title = 'Particulate and mortality trends by confounders',
-                  theme = theme(plot.title = element_text(size = 20)))
+# SAVE
+ggsave(file="figures/plotareavar.pdf", plotareavar, width=10, height=6)
+ggsave(file="figures/plotsesvar.pdf", plotsesvar, width=10, height=6)
+ggsave(file="figures/plotothervar.pdf", plotothervar, width=10, height=6)
 
-#SAVE PLOT
-ggsave(file = "C:/Users/lsh2004062/Downloads/trendarea.png",
-       plot, width = 4000, height =2500, units = "px")
-
-
-###################################################
-#CREATE PLOTS FOR INDIVIDUAL SES CONFS
-#Arrange plots
-plot<-wrap_plots(c(pmlist[which(confall %in% confses)],
-                   mrlist[which(confall %in% confses)]) , ncol=4) + 
-  plot_annotation(title = 'Particulate and mortality trends by confounders',
-                  theme = theme(plot.title = element_text(size = 20)))
-
-#SAVE PLOT
-ggsave(file = "C:/Users/lsh2004062/Downloads/trendses.png",
-       plot, width = 5000, height =2500, units = "px")
-
-###################################################
-#CREATE PLOTS FOR INDIVIDUAL SES CONFS (2 PLOTS SEPARATE)
-#Arrange plots
-plot<-wrap_plots(c(pmlist[which(confall %in% confother)][1:3],
-                   mrlist[which(confall %in% confother)][1:3]) , ncol=3) + 
-  plot_annotation(title = 'Particulate and mortality trends by confounders',
-                  theme = theme(plot.title = element_text(size = 20)))
-
-#SAVE PLOT
-ggsave(file = "C:/Users/lsh2004062/Downloads/trendother1.png",
-       plot, width = 4000, height =2500, units = "px")
-
-
-
-plot<-wrap_plots(c(pmlist[which(confall %in% confother)][4:6],
-                   mrlist[which(confall %in% confother)][4:6]) , ncol=3) + 
-  plot_annotation(title = 'Particulate and mortality trends by confounders',
-                  theme = theme(plot.title = element_text(size = 20)))
-
-#SAVE PLOT
-ggsave(file = "C:/Users/lsh2004062/Downloads/trendother2.png",
-       plot, width = 4000, height =2500, units = "px")

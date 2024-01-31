@@ -30,8 +30,18 @@ bdbasevar <- bdbasevar[,`:=`(
   wthratiocat = factor(ifelse(sex=="Female", cut(wthratio, c(0,0.80,0.85,100), 
     label = c("low", "medium","high")), cut(wthratio, c(0,0.95,1,100), 
       label = c("low", "medium","high"))), labels =c("low", "medium","high")),
-  greenspacecat = cut(greenspace, 5, label = c("1th","2nd","3rd","4th","5th")),
-  tdicat = cut(tdi, 5, label = c("1th","2nd","3rd","4th","5th")))]
+  greenspacecat = cut(greenspace, 5, 
+    label = paste(c("1th","2nd","3rd","4th","5th"), "quintile")),
+  tdicat = cut(tdi, 5, 
+    label = paste(c("1th","2nd","3rd","4th","5th"), "quintile")))]
+
+# RELABEL SOME CATEGORICAL VARIABLES
+levels(bdbasevar$educ) <- c("Low","Professional","Highschool","College")
+levels(bdbasevar$income) <- levels(bdbasevar$income) |> 
+  sub(" to ", "-", x=_) |> sub("Less than ", "<", x=_) |>
+  sub("Greater than ", "<", x=_)
+levels(bdbasevar$alcoholintake) <- c("Never","Occasionally","1-3 a month",
+  "1-2 a week", "3-4 a week", "Daily or almost")
 
 # TRANSFORM BASELINE VARIABLES IN UNORDERED FACTORS (FOR REGRESSION MODEL)
 ordvar <- names(bdbasevar)[sapply(bdbasevar, is.ordered)]
