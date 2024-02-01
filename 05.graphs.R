@@ -98,8 +98,8 @@ plotratevarlist <- lapply(seq(varlist), function(i) {
     geom_bar(stat = "identity", col=1, fill=grey(0.7), alpha=0.3) +
     #ylim(0, 1300) +
     labs(y="Mortality rate (x 100,000)", x="") +
-    #scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
-    scale_x_discrete(guide = guide_axis(angle = 35)) +
+    scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
+    #scale_x_discrete(guide = guide_axis(angle = 35)) +
     theme_bw() 
 })
 
