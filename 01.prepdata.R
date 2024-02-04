@@ -11,11 +11,10 @@ bdcohortinfo <- readRDS(paste0(maindir, "bdcohortinfo.RDS")) |> as.data.table()
 
 # LOAD BASELINE VARS (SECOND IMPUTED DATASET)
 bdbasevar <- readRDS(paste0(maindir, "bdbasevarmi.RDS")) |> 
-  complete(action="all") |> _[[2]] |> as.data.table()
+  complete(action=2) |> as.data.table()
 
-# LOAD OUTCOME DATASET (EXCLUDING ACCIDENTAL DEATHS)
-outdeath <- readRDS(paste0(maindir, "outdeath.RDS")) |> as.data.table() |>
-  subset(substr(icd10,1,1) %in% icdcode)
+# LOAD OUTCOME DATASET
+outdeath <- readRDS(paste0(maindir, "outdeath.RDS")) |> as.data.table()
 
 # LOAD THE PM DATA, DEFINE THE LAGS
 pmdata <- fread(paste0(pmdir, "ukbenv_annual_2003-2021_rebadged.csv"))
@@ -55,10 +54,12 @@ fulldata <- merge(bdcohortinfo, outdeath, all.x=T) |>
 #fulldata[, birthmonth:=round(as.numeric(dob)/30)]
 fulldata[, birthyear:=year(dob)]
 
-# DEFINE EXIT TIME AND EVENT (RESET IF EVENT AFTER END OF FOLLOW-UP)
+# DEFINE EXIT TIME AND RESET IF EVENT AFTER END OF FOLLOW-UP
 fulldata[, dexit:=fifelse(!is.na(dod), pmin(devent,dendfu), dendfu)]
 fulldata[devent>dexit, `:=`(devent=NA, icd10=NA)]
-fulldata[, event:=(!is.na(icd10))+0]
+
+# DEFINE EVENT (NON-EXTERNAL MORTALITY ONLY)
+fulldata[, event:= (!is.na(icd10) & substr(icd10,1,1) %in% icdcode) + 0]
 
 # SPLIT THE DATA BY CALENDAR YEAR
 cut <- year(range(fulldata$dstartfu)[1]):year(range(fulldata$dendfu)[2]) |>

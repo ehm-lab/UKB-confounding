@@ -45,8 +45,6 @@ plotage <- pmdata |>
   theme_bw()
 
 # SAVE AS SINGLE PLOT
-# ggsave(file="figures/plottrend.png", plotyear + plotage, width=5000,
-#   height=1500, units="px")
 ggsave(file="figures/plottrend.pdf", plotyear + plotage, width=15, height=5)
 
 ################################################################################
@@ -64,8 +62,7 @@ plotasscentre <- summarise(fulldata, pm25=mean(pm25), .by=asscentre) |>
   scale_x_continuous(breaks=5:9*100, minor_breaks=NULL) +
   theme_bw()
 
-#SAVE PLOT
-#ggsave(file="figures/plotasscentre.png", width=3500, height=2000, units="px")
+# SAVE PLOT
 ggsave(file="figures/plotasscentre.pdf", width=10, height=6)
 
 ################################################################################
@@ -113,6 +110,6 @@ plotothervar <- (Reduce('+', plotexpvarlist[7:9]) + plot_layout(widths=c(5,6,3))
 
 # SAVE
 ggsave(file="figures/plotareavar.pdf", plotareavar, width=10, height=6)
-ggsave(file="figures/plotsesvar.pdf", plotsesvar, width=10, height=6)
+ggsave(file="figures/plotsesvar.png", plotsesvar, width=10, height=6)
 ggsave(file="figures/plotothervar.pdf", plotothervar, width=10, height=6)
 

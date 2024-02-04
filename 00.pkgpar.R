@@ -12,6 +12,7 @@ library(survival) ; library(Epi)
 library(dlnm) ; library(splines) ; library(coxme)
 library(mice)
 library(ggplot2); library(patchwork) ; library(scales) ; library(ggrepel)
+library(sf)
 #library(foreach) ; library(doParallel)
 
 # DIRECTORIES
