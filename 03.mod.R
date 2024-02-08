@@ -17,7 +17,7 @@ mod <- coxph(fmod, data=fulldata, ties="efron")
 reslist$main <- ci.exp(mod, subset="pm25_07", ctr.mat=matrix(10))
 
 ################################################################################
-# ALTERNATIVE TO MAIN MODEL
+# TEMPORAL CONFOUNDING
 
 # WITH SPLINES OF AGE
 fmod <- funfmod(strata=c("asscentre", "sex"), 
@@ -25,25 +25,28 @@ fmod <- funfmod(strata=c("asscentre", "sex"),
 reslist$splage <- update(mod, fmod) |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
-# WITH AGE AS TIME AXIS AND SPLINES OF CALENDAR TIME
-fmod <- funfmod(response="Surv(agestartfu, ageexit, event)",
-  strata=c("asscentre", "sex"), 
-  conf=c(confall, "ns(dstartfu, knots=equalknots(dstartfu, df=4))"))
-reslist$ageaxis <- update(mod, fmod) |> 
-  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
-
-################################################################################
-# TEMPORAL CONFOUNDING
-
 # WITHOUT CONTROL FOR AGE
 fmod <- funfmod(strata=c("asscentre", "sex"))
 reslist$noage <- update(mod, fmod) |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
-# WITHOUT CONTROL FOR CALENDAR TIME
+# WITH AGE AS TIME AXIS AND STRATIFIED BY CALENDAR TIME
+fmod <- funfmod(response="Surv(agestartfu, ageexit, event)",
+  strata=c("asscentre", "sex", "year"))
+reslist$ageaxis1 <- update(mod, fmod) |> 
+  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
+
+# WITH AGE AS TIME AXIS AND SPLINES OF CALENDAR TIME
+fmod <- funfmod(response="Surv(agestartfu, ageexit, event)",
+  strata=c("asscentre", "sex"), 
+  conf=c(confall, "ns(dstartfu, knots=equalknots(dstartfu, df=4))"))
+reslist$ageaxis2 <- update(mod, fmod) |> 
+  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
+
+# WITH AGE AS TIME AXIS AND WITHOUT CONTROL FOR CALENDAR TIME
 fmod <- funfmod(response="Surv(agestartfu, ageexit, event)",
   strata=c("asscentre", "sex"))
-reslist$nocaltime <- update(mod, fmod) |> 
+reslist$ageaxis3 <- update(mod, fmod) |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
 ################################################################################

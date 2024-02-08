@@ -11,11 +11,10 @@ bdcohortinfo <- readRDS(paste0(maindir, "bdcohortinfo.RDS")) |> as.data.table()
 
 # LOAD BASELINE VARS (SECOND IMPUTED DATASET)
 bdbasevar <- readRDS(paste0(maindir, "bdbasevarmi.RDS")) |> 
-  complete(action="all") |> _[[2]] |> as.data.table()
+  complete(action=2) |> as.data.table()
 
-# LOAD OUTCOME DATASET (EXCLUDING ACCIDENTAL DEATHS)
-outdeath <- readRDS(paste0(maindir, "outdeath.RDS")) |> as.data.table() |>
-  subset(substr(icd10,1,1) %in% icdcode)
+# LOAD OUTCOME DATASET
+outdeath <- readRDS(paste0(maindir, "outdeath.RDS")) |> as.data.table()
 
 # LOAD THE PM DATA, DEFINE THE LAGS
 pmdata <- fread(paste0(pmdir, "ukbenv_annual_2003-2021_rebadged.csv"))
@@ -30,8 +29,18 @@ bdbasevar <- bdbasevar[,`:=`(
   wthratiocat = factor(ifelse(sex=="Female", cut(wthratio, c(0,0.80,0.85,100), 
     label = c("low", "medium","high")), cut(wthratio, c(0,0.95,1,100), 
       label = c("low", "medium","high"))), labels =c("low", "medium","high")),
-  greenspacecat = cut(greenspace, 5, label = c("1th","2nd","3rd","4th","5th")),
-  tdicat = cut(tdi, 5, label = c("1th","2nd","3rd","4th","5th")))]
+  greenspacecat = cut(greenspace, 5, 
+    label = paste(c("1th","2nd","3rd","4th","5th"), "quintile")),
+  tdicat = cut(tdi, 5, 
+    label = paste(c("1th","2nd","3rd","4th","5th"), "quintile")))]
+
+# RELABEL SOME CATEGORICAL VARIABLES
+levels(bdbasevar$educ) <- c("Low","Professional","Highschool","College")
+levels(bdbasevar$income) <- levels(bdbasevar$income) |> 
+  sub(" to ", "-", x=_) |> sub("Less than ", "<", x=_) |>
+  sub("Greater than ", "<", x=_)
+levels(bdbasevar$alcoholintake) <- c("Never","Occasionally","1-3 a month",
+  "1-2 a week", "3-4 a week", "Daily or almost")
 
 # TRANSFORM BASELINE VARIABLES IN UNORDERED FACTORS (FOR REGRESSION MODEL)
 ordvar <- names(bdbasevar)[sapply(bdbasevar, is.ordered)]
@@ -45,10 +54,12 @@ fulldata <- merge(bdcohortinfo, outdeath, all.x=T) |>
 #fulldata[, birthmonth:=round(as.numeric(dob)/30)]
 fulldata[, birthyear:=year(dob)]
 
-# DEFINE EXIT TIME AND EVENT (RESET IF EVENT AFTER END OF FOLLOW-UP)
+# DEFINE EXIT TIME AND RESET IF EVENT AFTER END OF FOLLOW-UP
 fulldata[, dexit:=fifelse(!is.na(dod), pmin(devent,dendfu), dendfu)]
 fulldata[devent>dexit, `:=`(devent=NA, icd10=NA)]
-fulldata[, event:=(!is.na(icd10))+0]
+
+# DEFINE EVENT (NON-EXTERNAL MORTALITY ONLY)
+fulldata[, event:= (!is.na(icd10) & substr(icd10,1,1) %in% icdcode) + 0]
 
 # SPLIT THE DATA BY CALENDAR YEAR
 cut <- year(range(fulldata$dstartfu)[1]):year(range(fulldata$dendfu)[2]) |>

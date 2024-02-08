@@ -9,9 +9,10 @@
 # LOAD THE PACKAGES
 library(data.table) ; library(dplyr)
 library(survival) ; library(Epi)
-library(splines) ; library(coxme)
+library(dlnm) ; library(splines) ; library(coxme)
 library(mice)
 library(ggplot2); library(patchwork) ; library(scales) ; library(ggrepel)
+library(sf)
 #library(foreach) ; library(doParallel)
 
 # DIRECTORIES
