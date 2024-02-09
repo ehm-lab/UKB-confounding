@@ -42,19 +42,19 @@ senslist$coxme <- update(mod, formula=fmod, cluster=asscentre) |>
 # EXCLUSION OF LONDON AND/OR GLASGOW
 
 # FIT MODEL WITHOUT LONDON 
-fmod <- funfmod()
+fmod <- funfmod(strata=c("sex","birthyear"), conf=c(confall))
 senslist$nolnd <- update(mod, data=subset(fulldata, !(asscentre %in% 
     c("Hounslow","Croydon","Barts")))) |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
 # FIT MODEL WITHOUT GLASGOW
-fmod <-  funfmod()
+fmod <-  funfmod(strata=c("sex","birthyear"), conf=c(confall))
 senslist$noglg <- update(mod, data=subset(fulldata, 
   !(asscentre %in% c("Glasgow")))) |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
 # FIT MODEL WITHOUT LONDON AND GLASGOW
-fmod <-  funfmod()
+fmod <-  funfmod(strata=c("sex","birthyear"), conf=c(confall))
 senslist$nolndglg <- update(mod, data=subset(fulldata, 
   !(asscentre %in% c("Hounslow","Croydon","Barts","Glasgow")))) |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
