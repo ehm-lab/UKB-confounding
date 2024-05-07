@@ -36,7 +36,6 @@ tabdexp <- lapply(dvarcat, function(x) {
   # EXTRACT STATS AND MISSING
   mean <- aggregate(fulldata$pm25_07, by=list(fulldata[[x]]), FUN=mean)
   sd <- aggregate(fulldata$pm25_07, by=list(fulldata[[x]]), FUN=sd)
-  nmis <- sum(is.na(dd[[x]]))
   text <- paste0(funformat(mean[,2], digits=2, big.mark=","), " (", 
                  funformat(sd[,2], digits=2, big.mark=","),")")
   lev <- levels(fulldata[[x]])
