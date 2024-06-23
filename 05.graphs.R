@@ -28,7 +28,7 @@ plotyear <- pmdata |>
   labs(title="By calendar time", y=pmlab, x="Calendar year") +
   theme_bw()
 
-#PLOT MORTALITY RATES AND PM ACROSS AGE
+# PLOT MORTALITY RATES AND PM ACROSS AGE
 plotage <- pmdata |> 
   subset(eid %in% fulldata$eid) |> 
   summarize(pm25 = mean(pm25, na.rm=T), .by=agegr) |>

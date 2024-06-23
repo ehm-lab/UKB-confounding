@@ -13,14 +13,16 @@ bdcohortinfo <- readRDS(paste0(maindir, "bdcohortinfo.RDS")) |> as.data.table()
 bdbasevar <- readRDS(paste0(maindir, "bdbasevarmi.RDS")) |> 
   complete(action=2) |> as.data.table()
 
-# LOAD OUTCOME DATASET
-outdeath <- readRDS(paste0(maindir, "outdeath.RDS")) |> as.data.table()
+# LOAD OUTCOME DATASET, REMOVING DEATHS FOR EXTERNAL CAUSES
+outdeath <- readRDS(paste0(maindir, "outdeath.RDS")) |> as.data.table() |>
+  subset(substr(icd10,1,1) %in% icdcode)
 
-# LOAD THE PM DATA, DEFINE THE LAGS
+# LOAD THE PM DATA, DEFINE THE LAGS, EXCLUDE TEMPERATURE
 pmdata <- fread(paste0(pmdir, "ukbenv_annual_2003-2021_rebadged.csv"))
 names(pmdata)[1] <- "eid"
 pmdata[, paste0("pm25_",0,lag):=rowMeans(Reduce(cbind, shift(pm25, 0:lag))), 
   by=eid]
+pmdata[, tmean:=NULL]
 
 # CATEGORIZE CONTINUOUS VARIABLES
 bdbasevar <- bdbasevar[,`:=`(
@@ -45,21 +47,20 @@ levels(bdbasevar$alcoholintake) <- c("Never","Occasionally","1-3 a month",
 # TRANSFORM BASELINE VARIABLES IN UNORDERED FACTORS (FOR REGRESSION MODEL)
 ordvar <- names(bdbasevar)[sapply(bdbasevar, is.ordered)]
 bdbasevar[, (ordvar):=lapply(.SD, factor, ordered=F), .SDcols=ordvar]
-          
+
 # MERGE THE DATA ACROSS SOURCES: COHORT, OUTCOME, BASELINE VARIABLES
 fulldata <- merge(bdcohortinfo, outdeath, all.x=T) |> 
   merge(bdbasevar[, c("eid","asscentre","sex")])
 
-# CREATE AN (APPROXIMATE) MONTH OF BIRTH
-#fulldata[, birthmonth:=round(as.numeric(dob)/30)]
+# CREATE YEAR OF BIRTH
 fulldata[, birthyear:=year(dob)]
 
-# DEFINE EXIT TIME AND RESET IF EVENT AFTER END OF FOLLOW-UP
-fulldata[, dexit:=fifelse(!is.na(dod), pmin(devent,dendfu), dendfu)]
-fulldata[devent>dexit, `:=`(devent=NA, icd10=NA)]
+# DEFINE THE EVENT AND EXIT TIME
+fulldata[, event:=(!is.na(devent) & devent<=dendfu) + 0]
+fulldata[, dexit:=fifelse(event==1, devent, dendfu)]
 
-# DEFINE EVENT (NON-EXTERNAL MORTALITY ONLY)
-fulldata[, event:= (!is.na(icd10) & substr(icd10,1,1) %in% icdcode) + 0]
+# EXCLUDE SUBJECTS WITH EVENT BEFORE THE START OF THE FOLLOW-UP
+fulldata <- fulldata[dstartfu<dexit]
 
 # SPLIT THE DATA BY CALENDAR YEAR
 cut <- year(range(fulldata$dstartfu)[1]):year(range(fulldata$dendfu)[2]) |>
