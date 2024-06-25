@@ -69,8 +69,9 @@ fulldata[, `:=`(dstartfu=as.numeric(dstartfu), dexit=as.numeric(dexit))]
 fulldata <- survSplit(Surv(dstartfu, dexit, event) ~., fulldata, cut=cut) |> 
   as.data.table()
 
-# ASSIGN THE YEAR (AS THE ENTER TIME AFTER SPLITTING MINUS 1)
-fulldata[, year:= year(as.Date(dstartfu, origin=as.Date("1970-01-01")))-1]
+# ASSIGN THE YEAR AND THE YEAR OF LAG-0 EXPOSURE (MINUS ONE)
+fulldata[, year:= year(as.Date(dstartfu, origin=as.Date("1970-01-01")))]
+fulldata[, yearexp:= year-1]
 
 # CREATE AGE AT ENTER AND EXIT TIMES (AS DAYS)
 fulldata[, `:=`(agestartfu=(dstartfu-as.numeric(dob))/365.25,
@@ -81,10 +82,12 @@ fulldata <- subset(fulldata, select=-c(sex,asscentre)) |>
   merge(bdbasevar, by="eid") |> 
   setkey(eid, year)
 
-# MERGE WITH PM DATA REMOVING SUBJECTS/PERIODS WITH (PARTIALLY) MISSING EXPOSURE
+# MERGE WITH PM DATA USING LAG-0 YEAR DEFINITION
+# NB: OMITTING SUBJECTS/PERIODS WITH (PARTIALLY) MISSING EXPOSURE
 setkey(fulldata, eid, year)
 setkey(pmdata, eid, year)
-fulldata <- merge(fulldata, na.omit(pmdata), by=c("eid","year"))
+fulldata <- merge(fulldata, na.omit(pmdata), by.x=c("eid","yearexp"), 
+  by.y=c("eid","year"))
 
 # APPROXIMATE AGE GROUPS
 fulldata[, agegr:=cut(year-year(dob), breaks=agebreaks, labels=agelabs)]

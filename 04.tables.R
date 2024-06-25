@@ -31,12 +31,15 @@ tabdcat <- lapply(dvarcat, function(x) {
 # EXPOSURE 
 tabdexp <- lapply(dvarcat, function(x) {
   
+  # SELECT THE DATA
+  dd <- subset(bdbasevar, eid %in% fulldata$eid)
+  
   # EXTRACT STATS AND MISSING
-  mean <- fulldata[, mean(pm25_07), by=list(fulldata[[x]])]
-  sd <- fulldata[, sd(pm25_07), by=list(fulldata[[x]])]
+  mean <- tapply(fulldata$pm25_07, fulldata[[x]], mean)
+  sd <- tapply(fulldata$pm25_07, fulldata[[x]], sd)
   nmis <- sum(is.na(dd[[x]]))
-  text <- paste0(funformat(mean[[2]], digits=2, big.mark=","), " (", 
-    funformat(sd[[2]], digits=2, big.mark=","),")")
+  text <- paste0(funformat(mean, digits=2, big.mark=","), " (", 
+    funformat(sd, digits=2, big.mark=","),")")
   lev <- levels(fulldata[[x]])
   
   # PRODUCE TABLE
