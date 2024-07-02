@@ -16,8 +16,8 @@ library(sf)
 #library(foreach) ; library(doParallel)
 
 # DIRECTORIES
-maindir <- "V:/VolumeQ/AGteam/UKBiobank/data/processed/ukb671152/"
-#maindir <- "C:/Users/anton/Desktop/data/processed/ukb671152/"
+maindir <- "V:/VolumeQ/AGteam/UKBiobank/data/processed/ukb676307/"
+#maindir <- "C:/Users/anton/Desktop/data/processed/ukb676307/"
 pmdir <- "V:/VolumeQ/AGteam/UKBiobank/data/original/envdata/"
 #pmdir <- "C:/Users/anton/Desktop/data/"
 

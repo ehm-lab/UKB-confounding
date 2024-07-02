@@ -62,10 +62,23 @@ tabdrate <- lapply(dvarcat, function(x) {
 }) |> Reduce(rbind, x=_) |> as.data.table(keep.rownames=TRUE)
 
 # MERGE
-tabs <- merge.data.table(tabdcat, tabdexp, all.x=T, by=c("rn","V1"), sort=FALSE)
-tabs <- merge.data.table(tabs, tabdrate, all.x=T, by=c("rn","V1"), sort=FALSE)
-names(tabs) <- c("variable", "levels", "count(%)", "exposure average(SD)",
+tabdescr <- merge.data.table(tabdcat, tabdexp, all.x=T, by=c("rn","V1"), sort=FALSE)
+tabdescr <- merge.data.table(tabdescr, tabdrate, all.x=T, by=c("rn","V1"), sort=FALSE)
+names(tabdescr) <- c("variable", "levels", "count(%)", "exposure average(SD)",
   "death rate")
 
 # SAVE
-write.csv(tabs, file="tables/tabs.csv")
+write.csv(tabdescr, file="tables/tabdescr.csv")
+
+################################################################################
+# TABLE OF EFFECT ESTIMATES FOR THE MAIN AND SENSITIVITY ANALYSES
+
+# MAIN ANALYSIS
+tabmodres <- apply(modres, 1, frange) |> as.matrix()
+tabmodres <- cbind(paste("Model", seq(nrow(modres))), tabmodres)
+write.csv(tabmodres, file="tables/tabmodres.csv")
+
+# SENSITIVITY ANALYSIS
+apply(modsens, 1, frange) |> as.matrix() |>
+  write.csv(file="tables/tabmodsens.csv")
+
