@@ -6,7 +6,7 @@
 # PREPARE THE DATA
 ################################################################################
 
-# LOAD COHORT DATASET, BASELINE VARS, OUTCOME DATASET, IMPUTED VARS
+# LOAD COHORT DATASET
 bdcohortinfo <- readRDS(paste0(maindir, "bdcohortinfo.RDS")) |> as.data.table()
 
 # LOAD BASELINE VARS (SECOND IMPUTED DATASET)
