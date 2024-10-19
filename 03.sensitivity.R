@@ -33,9 +33,15 @@ fmod <- funfmod(strata=c("sex","birthyear"),
 senslist$frailty <- update(mod, fmod) |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
+# FIT MODEL WITH FRAILTY WITH GAUSSIAN RANDOM EFFECTS
+fmod <- funfmod(strata=c("sex","birthyear"), 
+  conf=c(confall, "frailty(asscentre, distribution='gaussian')"))
+senslist$frailty2 <- update(mod, fmod) |> 
+  ci.exp(subset="pm25_07", ctr.mat=matrix(10))
+
 # FIT MODEL WITH CLUSTER (DO NOT USE "cluster(asscentre)" in formula)
 fmod <- funfmod(strata=c("sex","birthyear"), conf=confall)
-senslist$coxme <- update(mod, formula=fmod, cluster=asscentre) |>  
+senslist$cluster <- update(mod, formula=fmod, cluster=asscentre) |>  
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
 ################################################################################
