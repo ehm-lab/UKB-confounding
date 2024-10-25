@@ -57,6 +57,9 @@ fmod <- funfmod(strata=c("sex", "birthyear"))
 reslist$noasscen <- update(mod, fmod) |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
+################################################################################
+# AREA-LEVEL VARIABLES CONFOUNDING
+
 # WITHOUT SPATIAL (AREA-LEVEL) PREDICTORS
 for(var in confarea) {
   cat(var, "")
@@ -66,14 +69,14 @@ for(var in confarea) {
 }
 
 ################################################################################
-# INDIVIDUAL-LEVEL CONFOUNDING
+# INDIVIDUAL-LEVEL VARIABLES CONFOUNDING
 
 # WITHOUT INDIVIDUAL SES VARS
 fmod <- funfmod(conf=setdiff(confall, confses))
 reslist$noses <- update(mod, fmod) |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
-# WITHOUT OTHER INDIVIDUAL VARS
+# WITHOUT LIFESTYLE INDIVIDUAL VARS
 fmod <- funfmod(conf=setdiff(confall, confother))
 reslist$noother <- update(mod, fmod) |> 
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))

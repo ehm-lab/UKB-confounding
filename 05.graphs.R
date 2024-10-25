@@ -28,7 +28,7 @@ plotyear <- pmdata |>
   labs(title="By calendar time", y=pmlab, x="Calendar year") +
   theme_bw()
 
-#PLOT MORTALITY RATES AND PM ACROSS AGE
+# PLOT MORTALITY RATES AND PM ACROSS AGE
 plotage <- pmdata |> 
   subset(eid %in% fulldata$eid) |> 
   summarize(pm25 = mean(pm25, na.rm=T), .by=agegr) |>
@@ -69,10 +69,10 @@ ggsave(file="figures/plotasscentre.pdf", width=10, height=6)
 # CONTEXTUAL AND INDIVIDUAL-LEVEL VARIABLES
 
 # LIST OF VARIABLES
-varlist <- c("tdicat","greenspacecat","urbrur",
+varlist <- c("tdicat","urbrur","greenspacecat",
   "educ", "income", "employ",
   "smkpackyearcat", "alcoholintake", "ipaq")
-varlabs <- c("Area-level deprivation", "Greenspace", "Urban-rural",
+varlabs <- c("Area-level deprivation", "Urban-rural", "Greenspace", 
   "Education", "Income (£)", "Employment", 
   "Smoking", "Alcohol intake", "Physical activity")
 

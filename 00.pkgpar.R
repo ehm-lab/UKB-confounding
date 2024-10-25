@@ -16,9 +16,9 @@ library(sf)
 #library(foreach) ; library(doParallel)
 
 # DIRECTORIES
-maindir <- "V:/VolumeQ/AGteam/UKBiobank/data/processed/ukb671152/"
-#maindir <- "C:/Users/anton/Desktop/data/processed/ukb671152/"
-pmdir <- "V:/VolumeQ/AGteam/UKBiobank/data/original/envdata/"
+maindir <- "V:/VolumeQ/AGteam/UKBiobank/data/processed/ukb676307/"
+#maindir <- "C:/Users/anton/Desktop/data/processed/ukb676307/"
+pmdir <- "V:/VolumeQ/AGteam/UKBiobank/data/original/envdata/ver2021/"
 #pmdir <- "C:/Users/anton/Desktop/data/"
 
 # SELECT MORTALITY OUTCOMES (EXCLUDE ACCIDENTAL)
@@ -65,13 +65,13 @@ fdstat <- function(x, per=perlin, digits=2, big.mark="", sep=" to ")
 # FUNCTION TO DEFINE DEATH RATES BY SOME VARIABLE
 frate <- function(data, var, mult=10^5) 
   summarise(data, cases=sum(event), py=sum(dexit-dstartfu)/365.25, 
-    rate=cases/py*10^5, .by=var)
+    rate=cases/py*10^5, .by=var) |> arrange(get(var))
 
 # AGE GROUPING
 agebreaks <- c(0, 9:16*5, 100)
 agelabs <- c("<45", paste0(9:15*5, "-", 9:15*5+4), "80+")
 
 # LISTS OF VARIABLES FOR DESCRIPTIVE STATS
-dvarcat <- c("sex","ethnic","employ","educ","income","ipaq","wthratiocat",
-             "alcoholintake","smkstatus","smkpackyearcat","livealone",
-             "greenspacecat","tdicat","urbrur")
+dvarcat <- c("sex","tdicat","urbrur","greenspacecat","ethnic","educ",
+  "income","employ","smkstatus","smkpackyearcat","alcoholintake","wthratiocat",
+  "ipaq","livealone")
