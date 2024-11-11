@@ -78,7 +78,7 @@ tabmodres <- apply(modres, 1, frange) |> as.matrix()
 tabmodres <- cbind(paste("Model", seq(nrow(modres))), tabmodres)
 write.csv(tabmodres, file="tables/tabmodres.csv")
 
-# SENSITIVITY ANALYSIS
-apply(modsens, 1, frange) |> as.matrix() |>
-  write.csv(file="tables/tabmodsens.csv")
-
+# SENSITIVITY ANALYSIS (TWO SEPARATE TABLES)
+tabmodsens <- apply(modsens, 1, frange) |> as.matrix()
+write.csv(tabmodsens[1:9,], file="tables/tabmodsens1.csv")
+write.csv(tabmodsens[10:15,], file="tables/tabmodsens2.csv")

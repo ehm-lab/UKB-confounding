@@ -17,9 +17,11 @@ library(sf)
 
 # DIRECTORIES
 maindir <- "V:/VolumeQ/AGteam/UKBiobank/data/processed/ukb676307/"
-#maindir <- "C:/Users/anton/Desktop/data/processed/ukb676307/"
 pmdir <- "V:/VolumeQ/AGteam/UKBiobank/data/original/envdata/ver2021/"
-#pmdir <- "C:/Users/anton/Desktop/data/"
+
+# CREATE FOLDERS (IF NEEDED)
+for(fold in c("tables","figures","temp"))
+  if(!fold %in% list.files()) dir.create(fold)
 
 # SELECT MORTALITY OUTCOMES (EXCLUDE ACCIDENTAL)
 icdcode <- LETTERS[seq(which(LETTERS=="R"))]

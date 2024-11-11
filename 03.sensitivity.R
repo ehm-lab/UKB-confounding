@@ -66,6 +66,17 @@ senslist$nolndglg <- update(mod, data=subset(fulldata,
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
 ################################################################################
+# SINGLE LIFESTYLE CONFOUNDERS
+
+# EXCLUDE EACH LYFESTYLE PREDICTOR IN TURN
+for(var in confother) {
+  cat(var, "")
+  fmod <- funfmod(conf=setdiff(confall, var))
+  senslist[[paste0("no", var)]] <- update(mod, fmod) |> 
+    ci.exp(subset="pm25_07", ctr.mat=matrix(10))
+}
+
+################################################################################
 # PUT TOGETHER AND SAVE
 
 # ASSEMBLE
