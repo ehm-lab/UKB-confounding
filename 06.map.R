@@ -16,7 +16,7 @@ file.remove(list.files()[grep("Countries_December_2022", list.files(), fixed=T)]
 
 # LOAD ASSESSMENT CENTRE DATA
 asscentreloc <- read.csv(paste0("V:/VolumeQ/AGteam/UKBiobank/data/original/",
-  "Assessment_centre.csv"))
+  "asscentre.csv"))
 
 # MAP
 mapasscentre <- ggplot(data=countryshp) + 
