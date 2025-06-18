@@ -2,6 +2,7 @@
 temp/
 figures/
 tables/
+data/
 
 # History files
 .Rhistory

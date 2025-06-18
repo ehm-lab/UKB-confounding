@@ -1,5 +1,14 @@
 ################################################################################
-# CONFOUNDING ISSUES IN AIR POLLUTION EPIDEMIOLOGY
+# Original R code for the analysis in:
+#
+# Vanoli J, et al. Confounding mechanisms and adjustment strategies in air 
+#   pollution epidemiology: a case-study assessment with the UK Biobank cohort. 
+#   Under review. 
+# http://...
+#
+# * an updated version of this code, compatible with future versions of the
+#   software, is available at:
+#   https://github.com/gasparrini/UKB-confounding
 ################################################################################
 
 ################################################################################
@@ -57,9 +66,9 @@ plotasscentre <- summarise(fulldata, pm25=mean(pm25), .by=asscentre) |>
   geom_point(aes(size=py), show.legend=F) +
   geom_smooth(method="lm", aes(weight=py), se=T) +
   geom_text_repel(aes(label=asscentre), size=3) +
-  coord_cartesian(xlim=c(460,950), ylim=c(5,15)) +
+  coord_cartesian(xlim=c(500,1040), ylim=c(5,15)) +
   labs(y=pmlab, x="Mortality rate (x 100,000)") +
-  scale_x_continuous(breaks=5:9*100, minor_breaks=NULL) +
+  scale_x_continuous(breaks=5:10*100, minor_breaks=NULL) +
   theme_bw()
 
 # SAVE PLOT
@@ -113,3 +122,15 @@ ggsave(file="figures/plotareavar.pdf", plotareavar, width=10, height=6)
 ggsave(file="figures/plotsesvar.png", plotsesvar, width=10, height=6)
 ggsave(file="figures/plotothervar.pdf", plotothervar, width=10, height=6)
 
+################################################################################
+# CORRELATION MATRIX PLOT
+
+# GENERATE THE PLOT
+corvar <- bdbasevar[, lapply(.SD, as.numeric)] |> cor()
+dimnames(corvar) <- list(names(bdbasevar), names(bdbasevar))
+fcol <- colorRampPalette(c(muted("blue"), "white", muted("red")))
+corrplot(corvar, tl.cex=0.5, col=fcol(200), tl.col="black")
+
+# SAVE
+dev.print(png, file="figures/plotcorvar.png", width=480*4, height=480*4,
+  res=72*4)

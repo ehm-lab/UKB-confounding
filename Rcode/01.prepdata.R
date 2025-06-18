@@ -1,28 +1,39 @@
 ################################################################################
-# CONFOUNDING ISSUES IN AIR POLLUTION EPIDEMIOLOGY
+# R code for reproducing the analysis in:
+#
+# Vanoli J, et al. Confounding mechanisms and adjustment strategies in air 
+#   pollution epidemiology: a case-study assessment with the UK Biobank cohort. 
+#   Under review. 
+# http://...
+#
+# * an updated version of this code, compatible with future versions of the
+#   software, is available at:
+#   https://github.com/gasparrini/UKB-confounding
 ################################################################################
 
 ################################################################################
 # PREPARE THE DATA
 ################################################################################
 
+# DOWNLOAD SYNTHETIC DATA FROM THE ZENODO REPOSITORY (IF NEEDED)
+files <- c("synthbdcohortinfo", "synthbdbasevar", "synthpmdata", "synthoutdeath")
+for(x in files) if(! paste0(x,".RDS") %in% list.files("data"))
+  download_zenodo("10.5281/zenodo.13983169", path="data", files=paste0(x,".RDS"))
+
 # LOAD COHORT DATASET
-bdcohortinfo <- readRDS(paste0(maindir, "bdcohortinfo.RDS")) |> as.data.table()
+bdcohortinfo <- readRDS("data/synthbdcohortinfo.RDS") |> as.data.table()
 
 # LOAD BASELINE VARS (SECOND IMPUTED DATASET)
-bdbasevar <- readRDS(paste0(maindir, "bdbasevarmi.RDS")) |> 
-  complete(action=2) |> as.data.table()
+bdbasevar <- readRDS("data/synthbdbasevar.RDS") |> as.data.table()
 
 # LOAD OUTCOME DATASET, REMOVING DEATHS FOR EXTERNAL CAUSES
-outdeath <- readRDS(paste0(maindir, "outdeath.RDS")) |> as.data.table() |>
+outdeath <- readRDS("data/synthoutdeath.RDS") |> as.data.table() |>
   subset(substr(icd10,1,1) %in% icdcode)
 
-# LOAD THE PM DATA, DEFINE THE LAGS, EXCLUDE TEMPERATURE
-pmdata <- fread(paste0(pmdir, "ukbenv_annual_2003-2021_rebadged.csv"))
-names(pmdata)[1] <- "eid"
+# LOAD THE PM DATA, DEFINE THE MOVING AVERAGE
+pmdata <- readRDS("data/synthpmdata.RDS") |> as.data.table()
 pmdata[, paste0("pm25_",0,lag):=rowMeans(Reduce(cbind, shift(pm25, 0:lag))), 
   by=eid]
-pmdata[, tmean:=NULL]
 
 # CATEGORIZE CONTINUOUS VARIABLES
 bdbasevar <- bdbasevar[,`:=`(

@@ -1,5 +1,14 @@
 ################################################################################
-# CONFOUNDING ISSUES IN AIR POLLUTION EPIDEMIOLOGY
+# Original R code for the analysis in:
+#
+# Vanoli J, et al. Confounding mechanisms and adjustment strategies in air 
+#   pollution epidemiology: a case-study assessment with the UK Biobank cohort. 
+#   Under review. 
+# http://...
+#
+# * an updated version of this code, compatible with future versions of the
+#   software, is available at:
+#   https://github.com/gasparrini/UKB-confounding
 ################################################################################
 
 ################################################################################
@@ -58,7 +67,7 @@ reslist$noasscen <- update(mod, fmod) |>
   ci.exp(subset="pm25_07", ctr.mat=matrix(10))
 
 ################################################################################
-# AREA-LEVEL VARIABLES CONFOUNDING
+# CONFOUNDING FROM AREA-LEVEL VARIABLES 
 
 # WITHOUT SPATIAL (AREA-LEVEL) PREDICTORS
 for(var in confarea) {
@@ -69,7 +78,7 @@ for(var in confarea) {
 }
 
 ################################################################################
-# INDIVIDUAL-LEVEL VARIABLES CONFOUNDING
+# CONFOUNDING FROM INDIVIDUAL-LEVEL VARIABLES
 
 # WITHOUT INDIVIDUAL SES VARS
 fmod <- funfmod(conf=setdiff(confall, confses))

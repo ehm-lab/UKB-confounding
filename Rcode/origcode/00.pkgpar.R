@@ -1,5 +1,14 @@
 ################################################################################
-# CONFOUNDING ISSUES IN AIR POLLUTION EPIDEMIOLOGY
+# Original R code for the analysis in:
+#
+# Vanoli J, et al. Confounding mechanisms and adjustment strategies in air 
+#   pollution epidemiology: a case-study assessment with the UK Biobank cohort. 
+#   Under review. 
+# http://...
+#
+# * an updated version of this code, compatible with future versions of the
+#   software, is available at:
+#   https://github.com/gasparrini/UKB-confounding
 ################################################################################
 
 ################################################################################
@@ -12,6 +21,7 @@ library(survival) ; library(Epi)
 library(dlnm) ; library(splines) ; library(coxme)
 library(mice)
 library(ggplot2); library(patchwork) ; library(scales) ; library(ggrepel)
+library(corrplot)
 library(sf)
 #library(foreach) ; library(doParallel)
 
