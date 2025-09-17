@@ -1,10 +1,10 @@
 ################################################################################
-# Original R code for the analysis in:
+# R code for reproducing the analysis in:
 #
-# Vanoli J, et al. Confounding mechanisms and adjustment strategies in air 
-#   pollution epidemiology: a case-study assessment with the UK Biobank cohort. 
-#   Under review. 
-# http://...
+# Vanoli J, et al. Confounding issues in air pollution epidemiology: an 
+#   empirical assessment with the UK Biobank cohort. International Journal of 
+#   Epidemiology. 2025;54(5):dyaf163. DOI: 10.1093/ije/dyaf163 
+# http://www.ag-myresearch.com/2025_vanoli_IJE.html
 #
 # * an updated version of this code, compatible with future versions of the
 #   software, is available at:
