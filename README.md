@@ -16,7 +16,7 @@ The repo provides a series of R scripts that can be used to replicate the analys
 
 ### Data
 
-The original data from the UKB cohort is available upon request (see [www.ukbiobank.ac.uk](https://www.ukbiobank.ac.uk)) but cannot be shared. For reproducibility purposes, a series of synthetic datasets are stored in Zenodo repository (<https://zenodo.org/records/13983170>), from which they can be downloaded manually or automatically using the R scripts. The datasets resemble the real data used in the analysis, and they were generated using the R package `synthpop` ([www.synthpop.org.uk](www.synthpop.org.uk)). Details on the data synthesis and codebooks for the datasets are provided in the repository.
+The original data from the UKB cohort is available upon request (see [www.ukbiobank.ac.uk](https://www.ukbiobank.ac.uk)) but cannot be shared. For reproducibility purposes, a series of synthetic datasets are stored in Zenodo repository (<https://zenodo.org/records/13983170>), from which they can be downloaded manually or automatically using the R scripts. The datasets resemble the real data used in the analysis, and they were generated using the R package `synthpop` [synthpop.org.uk](https://synthpop.org.uk). Details on the data synthesis and codebooks for the datasets are provided in the repository.
 
 The series of synthetic datasets are the following:
 
